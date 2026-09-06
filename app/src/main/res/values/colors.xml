@@ -2,4 +2,15 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- CashME Palette -->
+    <color name="green_primary">#21C25E</color>
+    <color name="green_dark">#189A4A</color>
+    <color name="green_light">#E3F9EC</color>
+    <color name="bg_general">#F7F8FA</color>
+    <color name="text_primary">#1A1A1A</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="red_expense">#E74C3C</color>
+    <color name="green_income">#27AE60</color>
+    <color name="gray_border">#E5E7EB</color>
 </resources>
