@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -24,6 +26,16 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Antes de carregar a tela, verifica se já está logado
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            // Se já tem um usuário logado, vai direto pra Main!
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_login);
 
         etEmail = findViewById(R.id.etEmail);
@@ -71,9 +83,20 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 if (!temErro) {
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    btnEntrar.setEnabled(false); // Evita duplo clique
+                    
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    mAuth.signInWithEmailAndPassword(emailDigitado, senhaDigitada)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    btnEntrar.setEnabled(true);
+                                    Toast.makeText(LoginActivity.this, "E-mail ou senha incorretos.", Toast.LENGTH_LONG).show();
+                                }
+                            });
                 }
             }
         });
