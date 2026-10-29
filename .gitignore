@@ -13,3 +13,15 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Firebase & Sensitive credentials
+google-services.json
+app/google-services.json
+*.jks
+*.keystore
+
+# Environment & Config
+.env
+.env.*
+!.env.example
+

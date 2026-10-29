@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "933033420355",
-    "project_id": "cashme-410e7",
-    "storage_bucket": "cashme-410e7.firebasestorage.app"
+    "project_number": "000000000000",
+    "project_id": "seu-projeto-firebase",
+    "storage_bucket": "seu-projeto-firebase.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:933033420355:android:29862f45fc3e50261116f6",
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
         "android_client_info": {
           "package_name": "com.example.cashme"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBLe3ezYNYpSCvx_PHeQjZ7c0EVxAWRzaE"
+          "current_key": "AIzaSy_SUA_CHAVE_AQUI"
         }
       ],
       "services": {
