@@ -11,6 +11,10 @@ public class Lancamento {
     private String data;
     private boolean isReceita;
 
+    // Construtor vazio obrigatório para o Firebase Firestore funcionar
+    public Lancamento() {
+    }
+
     public Lancamento(String descricao, double valor, String categoria, String data, boolean isReceita) {
         this.id = UUID.randomUUID().toString();
         this.descricao = descricao;

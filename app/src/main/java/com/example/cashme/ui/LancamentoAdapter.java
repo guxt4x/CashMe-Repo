@@ -20,9 +20,17 @@ public class LancamentoAdapter extends RecyclerView.Adapter<LancamentoAdapter.La
     private List<Lancamento> listaLancamentos;
     private Context context;
 
-    public LancamentoAdapter(List<Lancamento> listaLancamentos, Context context) {
+    // Interface para comunicar a MainActivity que o usuário quer deletar algo
+    public interface OnItemLongClickListener {
+        void onItemLongClick(Lancamento lancamento);
+    }
+    
+    private OnItemLongClickListener listener;
+
+    public LancamentoAdapter(List<Lancamento> listaLancamentos, Context context, OnItemLongClickListener listener) {
         this.listaLancamentos = listaLancamentos;
         this.context = context;
+        this.listener = listener;
     }
 
     @NonNull
@@ -53,6 +61,18 @@ public class LancamentoAdapter extends RecyclerView.Adapter<LancamentoAdapter.La
             //pinta o texto de vermelho
             holder.tvValue.setTextColor(ContextCompat.getColor(context, R.color.red_expense));
         }
+
+        // Adiciona o clique longo na "caixinha" inteira (itemView)
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // Dispara o alarme para a MainActivity avisando que este item foi segurado
+                if (listener != null) {
+                    listener.onItemLongClick(lancamento);
+                }
+                return true; // Retorna true para o Android saber que processamos o clique longo
+            }
+        });
     }
 
     @Override

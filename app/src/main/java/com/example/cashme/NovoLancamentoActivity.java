@@ -1,17 +1,27 @@
 package com.example.cashme;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.cashme.model.Lancamento;
+import com.example.cashme.repository.LancamentoRepository;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+
+import java.util.Calendar;
 
 public class NovoLancamentoActivity extends AppCompatActivity {
 
@@ -29,6 +39,10 @@ public class NovoLancamentoActivity extends AppCompatActivity {
     TextView tvIncomeText;
     TextView tvExpenseText;
     EditText etValue;
+    AutoCompleteTextView actvCategory;
+    EditText etDate;
+    EditText etDescription;
+    MaterialButton btnSalvar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +124,89 @@ public class NovoLancamentoActivity extends AppCompatActivity {
             }
             @Override
             public void afterTextChanged(Editable s) {}
+        });
+
+        actvCategory = findViewById(R.id.actvCategory);
+        // Lista de opçoes com vetor
+        String[] categorias = {"Alimentação", "Trabalho", "Transporte", "Saúde", "Lazer", "Contas", "Outros"};
+        // Criar um ArrayAdapter simples usando um layout nativo do Android
+        ArrayAdapter<String> adapterCategorias = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                categorias
+        );
+        // ligar o adapter ao campo
+        actvCategory.setAdapter(adapterCategorias);
+
+        // calendário para o usuario
+        etDate = findViewById(R.id.etDate);
+
+        etDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendario = Calendar.getInstance();
+                int dia = calendario.get(Calendar.DAY_OF_MONTH);
+                int mes = calendario.get(Calendar.MONTH);
+                int ano = calendario.get(Calendar.YEAR);
+
+                // cria a janela do calendario
+                DatePickerDialog datePicker = new DatePickerDialog(
+                        NovoLancamentoActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
+                                String dataFormatada = String.format("%02d/%02d/%04d", dayOfMonth, (month + 1), year);
+                                etDate.setText(dataFormatada);
+                            }
+                        },
+                ano, mes, dia
+                );
+                datePicker.show();
+            }
+        });
+
+        // Criando o botão de salvar
+        etDescription = findViewById(R.id.etDescription);
+        btnSalvar = findViewById(R.id.btnSalvar);
+
+        btnSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Pegar os textos
+                String descricaoStr = etDescription.getText().toString().trim();
+                String categoriaStr = actvCategory.getText().toString().trim();
+                String dataStr = etDate.getText().toString().trim();
+                String valorStr = etValue.getText().toString().trim();
+
+                // validação
+                if (descricaoStr.isEmpty() || valorStr.isEmpty()) {
+                    Toast.makeText(NovoLancamentoActivity.this,
+                            "Preencha a descrição e o valor!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // 3. Converter o Valor (Tirar a formatação bonita e transformar em Double)
+                // Ex: "1.500,00" -> tira ponto -> "1500,00" -> troca virgula -> "1500.00" -> Double
+                String valorLimpo = valorStr.replace(".", "").replace(",", ".");
+                double valorDouble = Double.parseDouble(valorLimpo);
+
+                Lancamento novoLancamento = new Lancamento(descricaoStr, valorDouble, categoriaStr, dataStr, isReceita);
+                
+                // Agora salvamos de verdade na nuvem!
+                LancamentoRepository repo = new LancamentoRepository();
+                repo.salvar(novoLancamento, new LancamentoRepository.OnDadosCarregadosListener() {
+                    @Override
+                    public void onSucesso() {
+                        Toast.makeText(NovoLancamentoActivity.this, "Lançamento salvo na nuvem!", Toast.LENGTH_SHORT).show();
+                        finish(); // Fecha a tela só DEPOIS de salvar na nuvem
+                    }
+
+                    @Override
+                    public void onErro(String mensagem) {
+                        Toast.makeText(NovoLancamentoActivity.this, "Erro ao salvar: " + mensagem, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
         });
     }
 
