@@ -13,9 +13,18 @@ import java.util.List;
 
 public class LancamentoRepository {
 
-    // Instância do banco de dados na nuvem
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference lancamentosRef = db.collection("lancamentos");
+    private final CollectionReference lancamentosRef;
+
+    public LancamentoRepository() {
+        // Inicializa a referência buscando a subcoleção do usuário atual
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
+            lancamentosRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId).collection("lancamentos");
+        } else {
+            lancamentosRef = FirebaseFirestore.getInstance().collection("lancamentos_anonimos");
+        }
+    }
 
     // Mantemos uma lista local em memória para servir a UI rapidamente após o carregamento
     public static List<Lancamento> lista = new ArrayList<>();

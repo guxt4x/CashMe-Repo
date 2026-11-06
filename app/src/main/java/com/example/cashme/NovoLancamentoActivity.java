@@ -104,7 +104,6 @@ public class NovoLancamentoActivity extends AppCompatActivity {
 
                         // Formata no padrão brasileiro (1.000,00)
                         java.text.DecimalFormat df = new java.text.DecimalFormat("#,##0.00");
-                        df.setDecimalFormatSymbols(new java.text.DecimalFormatSymbols(new java.util.Locale("pt", "BR")));
                         String formatted = df.format(parsed);
 
                         // Salva o estado atual e devolve pra tela
@@ -179,16 +178,21 @@ public class NovoLancamentoActivity extends AppCompatActivity {
                 String valorStr = etValue.getText().toString().trim();
 
                 // validação
-                if (descricaoStr.isEmpty() || valorStr.isEmpty()) {
+                if (descricaoStr.isEmpty() || valorStr.isEmpty() || categoriaStr.isEmpty() || dataStr.isEmpty()) {
                     Toast.makeText(NovoLancamentoActivity.this,
-                            "Preencha a descrição e o valor!", Toast.LENGTH_SHORT).show();
+                            "Preencha todos os campos!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // 3. Converter o Valor (Tirar a formatação bonita e transformar em Double)
-                // Ex: "1.500,00" -> tira ponto -> "1500,00" -> troca virgula -> "1500.00" -> Double
-                String valorLimpo = valorStr.replace(".", "").replace(",", ".");
-                double valorDouble = Double.parseDouble(valorLimpo);
+                // 3. Converter o Valor (Lógica Corrigida para Centavos)
+                // O usuário vê a máscara "20,00".
+                // Nós vamos remover tudo que não é número (vira "2000") 
+                // e depois dividimos por 100 para ter o Double correto (20.00).
+                String apenasNumeros = valorStr.replaceAll("[^\\d]", "");
+                if (apenasNumeros.isEmpty()) {
+                    apenasNumeros = "0";
+                }
+                double valorDouble = Double.parseDouble(apenasNumeros) / 100.0;
 
                 Lancamento novoLancamento = new Lancamento(descricaoStr, valorDouble, categoriaStr, dataStr, isReceita);
                 
