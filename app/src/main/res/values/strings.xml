@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CashMe</string>
+    <string name="ola_nome">Olá, %1$s</string>
 </resources>

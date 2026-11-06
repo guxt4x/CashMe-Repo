@@ -1,28 +1,25 @@
 package com.example.cashme;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.widget.TextView;
-import androidx.core.content.ContextCompat;
-
-import android.widget.Toast;
-import android.content.DialogInterface;
-import androidx.appcompat.app.AlertDialog;
 
 import com.example.cashme.model.Lancamento;
-
 import com.example.cashme.repository.LancamentoRepository;
 import com.example.cashme.ui.LancamentoAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import androidx.appcompat.app.AppCompatDelegate;
-import android.content.res.Configuration;
-import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,25 +49,8 @@ public class MainActivity extends AppCompatActivity {
         // Mudar o nome do topo da tela para o nome de quem logou!
         TextView tvWelcome = findViewById(R.id.tvWelcome);
         if (currentUser.getDisplayName() != null && !currentUser.getDisplayName().isEmpty()) {
-            tvWelcome.setText("Olá, " + currentUser.getDisplayName());
+            tvWelcome.setText(getString(R.string.ola_nome, currentUser.getDisplayName()));
         }
-
-        // --- Configuração da Ferramenta de Mudar Tema ---
-        ImageView ivThemeToggle = findViewById(R.id.ivProfile);
-        ivThemeToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Checa qual é o tema atual do celular
-                int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-                if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-                    // Se for noite, muda pro claro
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                } else {
-                    // Se for claro, muda pra noite
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                }
-            }
-        });
 
         // --- Configuração do Botão de Logout ---
         ImageView ivLogout = findViewById(R.id.ivLogout);
@@ -79,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Desloga do Firebase
                 FirebaseAuth.getInstance().signOut();
+
+                // Limpa a lista estática para que outro usuário não veja os dados
+                LancamentoRepository.lista.clear();
                 
                 // Manda de volta para a tela de Login e fecha a MainActivity
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
@@ -204,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Formata para o padrão brasileiro de moeda
         java.text.DecimalFormat df = new java.text.DecimalFormat("R$ #,##0.00");
-        df.setDecimalFormatSymbols(new java.text.DecimalFormatSymbols(new java.util.Locale("pt", "BR")));
 
         // Atualiza a tela
         tvIncomeValue.setText(df.format(totalReceitas));
